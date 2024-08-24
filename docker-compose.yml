@@ -1,0 +1,67 @@
+version: '3.7'
+
+services:
+  db:
+    image: terratort/terratort_back:db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: terratort_database
+      POSTGRES_USER: terratort_admin
+      POSTGRES_PASSWORD: terratortadmin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    container_name: db
+
+  backend:
+    image: terratort/backend:latest
+    command: >
+      sh -c "until pg_isready -h db -p 5432 -U terratort_admin; do echo waiting for postgres; sleep 2; done && python3 manage.py migrate && gunicorn main.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - PG_HOST=db  # Используйте имя сервиса, как указано в docker-compose.yml
+      - PG_PORT=5432
+      - PG_USER=terratort_admin
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    container_name: backend
+
+  migration:
+    image: terratort/migration:latest
+    build:
+      context: .
+      dockerfile: migration/Dockerfile
+    command: >
+      sh -c "until pg_isready -h db -p 5432 -U terratort_admin; do echo waiting for postgres; sleep 2; done && python3 manage.py makemigrations && python3 manage.py migrate"
+    volumes:
+      - ./terratort:/usr/src/app/
+    depends_on:
+      - backend
+      - db
+    container_name: migration
+
+  nginx:
+    image: terratort/nginx:latest
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    container_name: nginx
+    deploy:
+      restart_policy:
+        condition: any
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
