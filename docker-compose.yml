@@ -39,7 +39,7 @@ services:
       context: .
       dockerfile: migration/Dockerfile
     command: >
-      sh -c "until pg_isready -h db -p 5432 -U terratort_admin; do echo waiting for postgres; sleep 2; done && python3 manage.py makemigrations && python3 manage.py migrate"
+      sh -c "sleep 20 && python3 manage.py makemigrations && python3 manage.py migrate"
     volumes:
       - ./terratort:/usr/src/app/
     depends_on:
