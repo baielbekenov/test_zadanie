@@ -5,6 +5,12 @@ from apps.category.models import Category
 from apps.products.models import Product
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name']
+
+
 class ProductListSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
 

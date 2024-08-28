@@ -1,10 +1,11 @@
 from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.products.serializers import ProductListInCategorySerializer, ProductListSerializer
+from api.products.serializers import ProductListInCategorySerializer, ProductListSerializer, CategorySerializer
 from apps.category.models import Category
 from apps.products.models import Product
 
@@ -27,3 +28,11 @@ class CategoryDetail(APIView):
         data['flowers'] = product_serializer.data
 
         return Response({"result": data}, status=status.HTTP_200_OK)
+
+
+class CategoryListView(ListAPIView):
+    queryset = Category.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = CategorySerializer
+
+
