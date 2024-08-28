@@ -101,9 +101,9 @@ WSGI_APPLICATION = 'main.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config("PG_NAME", default="zherdesh_dev"),
-        'USER': config("PG_USER", default="zherdesh_user"),
-        'PASSWORD': config("PG_PASS", default="qwerty2003"),
+        'NAME': config("PG_NAME", default="terratort_database"),
+        'USER': config("PG_USER", default="terratort_admin"),
+        'PASSWORD': config("PG_PASS", default="terratortadmin"),
         'HOST': config("PG_HOST", default="db"),
         'PORT': config("PG_PORT", default="5432"),
     }
