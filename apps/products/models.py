@@ -10,7 +10,7 @@ class Product(models.Model):
                                     blank=True, null=True, verbose_name='Категории', related_name='productcategory')
     description = models.TextField(verbose_name='Описание', blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена')
-    weight = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Вес (кг)', blank=True, null=True)
+    weight = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Вес (кг)', blank=True, null=True)
     created_at = models.DateField(auto_now_add=True, verbose_name='Дата создание')
 
     class Meta:
