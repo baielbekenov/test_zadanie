@@ -3,7 +3,7 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=150, unique=True, null=False, verbose_name='Название')
-    created_at = models.CharField(max_length=150, unique=True, null=True, verbose_name='Дата создание')
+    created_at = models.DateField(auto_now_add=True, verbose_name='Дата создание')
 
     class Meta:
         verbose_name = 'Категория'
