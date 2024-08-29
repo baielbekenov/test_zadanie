@@ -21,7 +21,7 @@ class CustomTokenObtainSerializer(TokenObtainPairSerializer):
         password = attrs.get("password")
         user = authenticate(request=self.context.get('request'), phone=phone, password=password)
         if not user:
-            raise serializers.ValidationError(self.error_messages["no active account"], code="no active account")
+            raise serializers.ValidationError(self.error_messages["no_active_account"], code="no active account")
         refresh = self.get_token(user)
 
         data = {}
