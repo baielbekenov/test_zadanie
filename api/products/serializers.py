@@ -8,7 +8,7 @@ from apps.products.models import Product
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'image']
 
 
 class ProductListSerializer(serializers.ModelSerializer):
