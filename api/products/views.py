@@ -25,14 +25,17 @@ class CategoryDetail(APIView):
 
         category_serializer = self.serializer_class(category, context={'request': request})
         data = category_serializer.data
-        data['flowers'] = product_serializer.data
+        data['products'] = product_serializer.data
 
         return Response({"result": data}, status=status.HTTP_200_OK)
 
 
-class CategoryListView(ListAPIView):
-    queryset = Category.objects.all()
+class CategoryListView(APIView):
     permission_classes = [AllowAny]
     serializer_class = CategorySerializer
 
+    def get(self, request):
+        category = Category.objects.all()
+        serializer = self.serializer_class(category, many=True)
+        return Response({"result": serializer.data}, status=status.HTTP_200_OK)
 
