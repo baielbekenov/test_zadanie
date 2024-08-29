@@ -4,8 +4,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from api.products.serializers import ProductListInCategorySerializer, ProductListSerializer, CategorySerializer
+from api.products.serializers import ProductListInCategorySerializer, ProductListSerializer
 from apps.category.models import Category
 from apps.products.models import Product
 
@@ -29,13 +28,4 @@ class CategoryDetail(APIView):
 
         return Response({"result": data}, status=status.HTTP_200_OK)
 
-
-class CategoryListView(APIView):
-    permission_classes = [AllowAny]
-    serializer_class = CategorySerializer
-
-    def get(self, request):
-        category = Category.objects.all()
-        serializer = self.serializer_class(category, many=True)
-        return Response({"result": serializer.data}, status=status.HTTP_200_OK)
 
