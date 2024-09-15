@@ -113,7 +113,7 @@ class CartView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        cart = Cart.objects.filter(user_id=self.request.user)
+        cart = Cart.objects.filter(user_id=self.request.user).order_by('created_at')
         serializer = self.serializer_class(cart, many=True, context={'request': request})
         return Response({"result": serializer.data}, status=status.HTTP_200_OK)
 
