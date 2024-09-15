@@ -76,7 +76,7 @@ class CartItemCreateView(CreateAPIView):
 
 
 @extend_schema_view(
-    delete=extend_schema(
+    post=extend_schema(
         description='API для удаление продукта из корзины',
         summary='Удалить продукт из корзины'
     ),
@@ -84,21 +84,21 @@ class CartItemCreateView(CreateAPIView):
 class CartItemDeleteView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def delete(self, request, pk):
+    def post(self, request, pk):
         deletion_cart_item = CartItems.objects.filter(id=pk).first()
         if not deletion_cart_item:
             return Response({"message": "Нет такого обьекта"}, status=status.HTTP_404_NOT_FOUND)
         deletion_cart_item.quantity -= 1
         if deletion_cart_item.quantity <= 0:
             deletion_cart_item.delete()
-            return Response({"message": "Товар удален из корзины, количество стало 0"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"message": "Товар удален из корзины, количество стало 0"}, status=status.HTTP_200_OK)
         deletion_cart_item.total_item_price = deletion_cart_item.quantity * deletion_cart_item.price
         deletion_cart_item.save()
 
         cart = deletion_cart_item.cart_id
         cart.total_cart_price = cart.calculate_total_price()
         cart.save()
-        return Response({"message": "Количество товара уменьшено"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "Количество товара уменьшено"}, status=status.HTTP_200_OK)
 
 
 
