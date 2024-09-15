@@ -71,6 +71,7 @@ class CartItems(models.Model):
     class Meta:
         verbose_name = 'ТоварВКорзине'
         verbose_name_plural = 'ТоварыВКорзине'
+        ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
         self.total_item_price = self.quantity * self.price
