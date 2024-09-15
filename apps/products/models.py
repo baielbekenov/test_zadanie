@@ -52,14 +52,9 @@ class Cart(models.Model):
         return sum(item.total_item_price for item in self.cartitems.all())
 
     def save(self, *args, **kwargs):
-        # Проверяем, что корзина создается впервые (нет primary key)
         if not self.pk:
-            super().save(*args, **kwargs)  # Сохраняем объект, чтобы получить primary key
-
-        # Пересчитываем total_cart_price после создания объекта
+            super().save(*args, **kwargs)
         self.total_cart_price = self.calculate_total_price()
-
-        # Теперь вызываем сохранение только один раз
         return super().save(update_fields=['total_cart_price'])
 
 

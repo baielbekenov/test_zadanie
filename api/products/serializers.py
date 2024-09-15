@@ -56,13 +56,24 @@ class CartItemSerializer(serializers.ModelSerializer):
         # Убираем cart_id из validated_data, если оно там есть
         validated_data.pop('cart_id', None)
 
-        # Создаем объект CartItems с привязкой к корзине
-        cart_item = CartItems.objects.create(cart_id=cart, **validated_data)
+        # Проверяем, существует ли товар с таким же product_id в корзине
+        product_id = validated_data.get('product_id')
+        quantity = validated_data.get('quantity')
 
-        # Рассчитываем цену и общую стоимость
-        cart_item.price = cart_item.product_id.price
-        cart_item.total_item_price = cart_item.quantity * cart_item.price
-        cart_item.save()
+        try:
+            # Ищем товар в корзине
+            cart_item = CartItems.objects.get(cart_id=cart, product_id=product_id)
+            # Увеличиваем количество существующего товара
+            cart_item.quantity += quantity
+            cart_item.total_item_price = cart_item.quantity * cart_item.price
+            cart_item.save()
+
+        except CartItems.DoesNotExist:
+            # Если товара нет в корзине, создаем новый элемент
+            cart_item = CartItems.objects.create(cart_id=cart, **validated_data)
+            cart_item.price = cart_item.product_id.price
+            cart_item.total_item_price = cart_item.quantity * cart_item.price
+            cart_item.save()
 
         return cart_item
 

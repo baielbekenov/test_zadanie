@@ -12,7 +12,6 @@ from apps.category.models import Category
 from apps.products.models import Product, Cart, CartItems
 
 
-
 @extend_schema_view(
     get=extend_schema(
         description='API для просмотра продуктов по категориям',
@@ -39,7 +38,6 @@ class CategoryDetail(APIView):
         return Response({"result": data}, status=status.HTTP_200_OK)
 
 
-
 @extend_schema_view(
     get=extend_schema(
         description='API для просмотра продукта детально',
@@ -61,7 +59,6 @@ class ProductDetailView(RetrieveAPIView):
             return Response({"info": "Товар не найден"}, status=status.HTTP_404_NOT_FOUND)
 
 
-
 @extend_schema_view(
     post=extend_schema(
         description='API для создание и добавление в корзину',
@@ -76,7 +73,6 @@ class CartItemCreateView(CreateAPIView):
         cart, created = Cart.objects.get_or_create(user_id=self.request.user)
         serializer.save(cart_id=cart)
         cart.save()
-
 
 
 @extend_schema_view(
@@ -114,7 +110,6 @@ class CartView(APIView):
         cart = Cart.objects.filter(user_id=self.request.user)
         serializer = self.serializer_class(cart, many=True, context={'request': request})
         return Response({"result": serializer.data}, status=status.HTTP_200_OK)
-
 
 
 @extend_schema_view(
