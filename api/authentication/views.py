@@ -5,8 +5,8 @@ from django.utils.encoding import force_bytes
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase
 from api.authentication.serializers import CodeResetPasswordSerializer, ResetPasswordConfirmSerializer, \
-    UserRegisterSerializer,  \
-    EmailCheckSerializer, CustomTokenObtainSerializer, PasswordResetSerializer
+    UserRegisterSerializer, \
+    EmailCheckSerializer, CustomTokenObtainSerializer, PasswordResetSerializer, UserGetSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.throttling import ScopedRateThrottle
 from drf_spectacular.utils import extend_schema, OpenApiParameter, extend_schema_view
@@ -38,6 +38,21 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
 
         return data
+
+
+class GetMeApiView(APIView):
+    """Позволяет пользователю получить информацию о себе"""
+    serializer_class = UserGetSerializer
+
+    def get(self, request):
+        user = self.request.user
+
+        return Response(
+            {
+                "user": UserGetSerializer(user).data,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class UserRegisterApiView(APIView):

@@ -9,6 +9,12 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import update_last_login
 
 
+class UserGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
 class CustomTokenObtainSerializer(TokenObtainPairSerializer):
     phone = serializers.CharField(write_only=True)
 
@@ -46,7 +52,6 @@ class CustomTokenObtainSerializer(TokenObtainPairSerializer):
         # добавьте в токен дополнительные клеймы
         token['phone'] = user.phone
         return token
-
 
 
 class UserRegisterSerializer(serializers.Serializer):
