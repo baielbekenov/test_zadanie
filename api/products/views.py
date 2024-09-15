@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView, CreateAPIView, DestroyAPIView
@@ -11,6 +12,13 @@ from apps.category.models import Category
 from apps.products.models import Product, Cart, CartItems
 
 
+
+@extend_schema_view(
+    get=extend_schema(
+        description='API для просмотра продуктов по категориям',
+        summary='Смотреть продукты согласно категории'
+    ),
+)
 class CategoryDetail(APIView):
     permission_classes = (AllowAny,)
     serializer_class = ProductListInCategorySerializer
@@ -31,6 +39,13 @@ class CategoryDetail(APIView):
         return Response({"result": data}, status=status.HTTP_200_OK)
 
 
+
+@extend_schema_view(
+    get=extend_schema(
+        description='API для просмотра продукта детально',
+        summary='Смотреть детально продукт'
+    ),
+)
 class ProductDetailView(RetrieveAPIView):
     permission_classes = (AllowAny,)
     queryset = Product.objects.all()
@@ -46,6 +61,13 @@ class ProductDetailView(RetrieveAPIView):
             return Response({"info": "Товар не найден"}, status=status.HTTP_404_NOT_FOUND)
 
 
+
+@extend_schema_view(
+    post=extend_schema(
+        description='API для создание и добавление в корзину',
+        summary='Добавить в корзину'
+    ),
+)
 class CartItemCreateView(CreateAPIView):
     queryset = CartItems.objects.all()
     serializer_class = CartItemSerializer
@@ -56,6 +78,13 @@ class CartItemCreateView(CreateAPIView):
         cart.save()
 
 
+
+@extend_schema_view(
+    delete=extend_schema(
+        description='API для удаление продукта из корзины',
+        summary='Удалить продукт из корзины'
+    ),
+)
 class CartItemDeleteView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -70,6 +99,13 @@ class CartItemDeleteView(APIView):
         return Response({"message": "Обьект удален"}, status=status.HTTP_204_NO_CONTENT)
 
 
+
+@extend_schema_view(
+    get=extend_schema(
+        description='API для просмотра корзины',
+        summary='Смотреть содержимое корзины'
+    ),
+)
 class CartView(APIView):
     serializer_class = CartSerializer
     permission_classes = (IsAuthenticated,)
@@ -78,6 +114,27 @@ class CartView(APIView):
         cart = Cart.objects.filter(user_id=self.request.user)
         serializer = self.serializer_class(cart, many=True, context={'request': request})
         return Response({"result": serializer.data}, status=status.HTTP_200_OK)
+
+
+
+@extend_schema_view(
+    delete=extend_schema(
+        description='API для очищение корзины',
+        summary='Очистить корзину'
+    ),
+)
+class CartClearView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        cart = Cart.objects.filter(user_id=request.user).first()
+        if not cart:
+            return Response({"message": "Корзина не найдена"}, status=status.HTTP_404_NOT_FOUND)
+
+        CartItems.objects.filter(cart_id=cart).delete()
+        cart.total_cart_price = 0
+        cart.save()
+        return Response({"message": "Корзина очищена"}, status=status.HTTP_204_NO_CONTENT)
 
 
 
