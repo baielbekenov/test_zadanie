@@ -14,6 +14,7 @@ from apps.products.models import Product, Cart, CartItems
 
 class ProductSearchView(ListAPIView):
     serializer_class = ProductSerializer
+    permission_classes = (AllowAny,)
 
     def get_queryset(self):
         """
