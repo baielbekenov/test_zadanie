@@ -117,20 +117,20 @@ DATABASES = {
 #     }
 # }
 
-# CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
-# CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
-#
-# CACHES = {
-#     'default': {
-#     'BACKEND': 'django_redis.cache.RedisCache',
-#     'LOCATION': 'redis://redis:6379',
-#     'OPTIONS': {
-#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-#             'IGNORE_EXCEPTIONS': True,
-#         },
-#     'KEY_PREFIX': 'terratort'
-#     },
-# }
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
+CACHES = {
+    'default': {
+    'BACKEND': 'django_redis.cache.RedisCache',
+    'LOCATION': 'redis://redis:6379',
+    'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'IGNORE_EXCEPTIONS': True,
+        },
+    'KEY_PREFIX': 'terratort'
+    },
+}
 
 CORS_ALLOW_ALL_ORIGINS = True
 
