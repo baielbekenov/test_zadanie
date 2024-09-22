@@ -43,7 +43,7 @@ class ProductSearchView(ListAPIView):
         summary='Смотреть продукты согласно категории'
     ),
 )
-@method_decorator(cache_page(60 * 5), name='retrieve')
+@method_decorator(cache_page(60 * 5), name='get')
 class CategoryDetail(APIView):
     permission_classes = (AllowAny,)
     serializer_class = ProductListInCategorySerializer
