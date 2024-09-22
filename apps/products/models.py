@@ -78,37 +78,4 @@ class CartItems(models.Model):
         super().save(*args, **kwargs)
 
 
-select = ((1, 'Glovo'),
-          (2, 'Яндекс.Доставка'),
-          )
-
-
-class Orders(models.Model):
-    user_id = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        verbose_name='Пользователь'
-    )
-    cart_id = models.ForeignKey(
-        Cart,
-        on_delete=models.PROTECT,
-        verbose_name='Корзина'
-    )
-    delivery_method = models.IntegerField(choices=select, verbose_name='Способ доставки', blank=True, null=True)
-    delivery_address = models.CharField(max_length=255, verbose_name='Адрес доставки')
-    recipient_phone = models.CharField(max_length=15, verbose_name='Телефон получателя')
-    comments = models.TextField(blank=True, verbose_name='Комментарии к доставке')
-    status = models.CharField(max_length=50, verbose_name='Статус заказа')
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Итоговая цена')
-    created_at = models.DateField(auto_now_add=True, verbose_name='Дата создания заказа')
-
-    class Meta:
-        verbose_name = 'Заказ'
-        verbose_name_plural = 'Заказы'
-
-    def __str__(self):
-        return f'Order {self.id} for {self.user_id}'
-
 
