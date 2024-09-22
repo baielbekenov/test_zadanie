@@ -6,10 +6,24 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.products.serializers import ProductListInCategorySerializer, ProductListSerializer, CartSerializer, \
-    CartItemSerializer
+    CartItemSerializer, ProductSerializer
 from django.db import IntegrityError
 from apps.category.models import Category
 from apps.products.models import Product, Cart, CartItems
+
+
+class ProductSearchView(ListAPIView):
+    serializer_class = ProductSerializer
+
+    def get_queryset(self):
+        """
+        Переопределение метода для фильтрации по названию товара
+        """
+        queryset = Product.objects.all()
+        name = self.request.query_params.get('name', None)
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+        return queryset
 
 
 @extend_schema_view(

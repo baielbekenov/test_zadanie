@@ -2,8 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from apps.products.models import Orders, Cart
+from apps.products.models import Cart
 from api.products.serializers import OrderSerializer
+from apps.orders.models import Order
 
 
 class CreateOrderView(APIView):
@@ -46,7 +47,7 @@ class UpdateOrderStatusView(APIView):
     def post(self, request, order_id):
         try:
             # Находим заказ
-            order = Orders.objects.get(id=order_id, user_id=request.user)
+            order = Order.objects.get(id=order_id, user_id=request.user)
 
             # Обновляем статус заказа после успешной оплаты
             order.status = 'Оплачено'
@@ -54,5 +55,5 @@ class UpdateOrderStatusView(APIView):
 
             return Response({"message": "Статус заказа обновлен на 'Оплачено'"}, status=status.HTTP_200_OK)
 
-        except Orders.DoesNotExist:
+        except Order.DoesNotExist:
             return Response({"error": "Заказ не найден"}, status=status.HTTP_404_NOT_FOUND)

@@ -1,7 +1,14 @@
 from rest_framework import serializers
 from django.conf import settings
 from apps.category.models import Category
-from apps.products.models import Product, Cart, CartItems, Orders
+from apps.products.models import Product, Cart, CartItems
+from apps.orders.models import Order
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'category_id', 'description', 'price', 'weight', 'created_at']
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -100,7 +107,7 @@ class CartSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Orders
+        model = Order
         fields = ['id', 'user_id', 'cart_id', 'delivery_method', 'delivery_address', 'recipient_phone', 'comments', 'status', 'total_price', 'created_at']
 
 

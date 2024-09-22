@@ -7,22 +7,9 @@ from apps.user.models import User
 
 
 class Order(models.Model):
-    PENDING = 'pending'
-    PROCESSED = 'processed'
-    DELIVERED = 'delivered'
-    CANCELLED = 'cancelled'
-
-    STATUS_CHOICES = [
-        (PENDING, 'Pending'),
-        (PROCESSED, 'Processed'),
-        (DELIVERED, 'Delivered'),
-        (CANCELLED, 'Cancelled'),
-    ]
-
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    cart = models.ForeignKey(Cart, on_delete=models.PROTECT)
+    user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    cart_id = models.ForeignKey(Cart, on_delete=models.PROTECT)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -48,8 +35,7 @@ class Payment(models.Model):
     payment_method = models.CharField(max_length=50, choices=[('card', 'Card'), ('cash', 'Cash on Delivery')], default='card')
     payment_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDING)
     payment_reference = models.CharField(max_length=100, null=True, blank=True)
-    currency_code = models.CharField(max_length=3, default='EUR')
-    is_cash_on_delivery = models.BooleanField(default=False)
+    currency_code = models.CharField(max_length=3, default='KGS')
     created_at = models.DateTimeField(auto_now_add=True)
 
 
