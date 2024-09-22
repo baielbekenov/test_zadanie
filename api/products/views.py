@@ -24,7 +24,7 @@ class ProductSearchView(ListAPIView):
         name = self.request.query_params.get('name', None)
         if name:
             queryset = queryset.filter(name__icontains=name)
-        return queryset
+        return Response({"result": queryset}, status=status.HTTP_200_OK)
 
 
 @extend_schema_view(
