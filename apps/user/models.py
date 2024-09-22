@@ -57,9 +57,7 @@ class User(AbstractUser):
     is_confirm = models.BooleanField(default=False, blank=True, verbose_name=_('Подтверждение почты'))
     created_at = models.DateField(auto_now_add=True)
     objects = UserManager()
-
     username = None  # Убираем поле username
-    first_name = None
     last_name = None
 
     USERNAME_FIELD = "phone"

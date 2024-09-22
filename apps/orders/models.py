@@ -6,10 +6,54 @@ from apps.user.models import User
 # Create your models here.
 
 
+class Coordinates(models.Model):
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name="Широта")
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name="Долгота")
+
+    class Meta:
+        verbose_name = 'Координат'
+        verbose_name_plural = 'Координаты'
+
+    def __str__(self):
+        return f"Lat: {self.latitude}, Lon: {self.longitude}"
+
+
+class Address(models.Model):
+    cityName = models.CharField(max_length=100, verbose_name="Город")
+    country = models.CharField(max_length=100, verbose_name="Страна")
+    postalCode = models.CharField(max_length=20, verbose_name="Почтовый индекс")
+    rawAddress = models.CharField(max_length=255, verbose_name="Полный адрес")
+    details = models.TextField(verbose_name="Дополнительные детали", blank=True, null=True)
+    streetName = models.CharField(max_length=255, verbose_name="Улица")
+    streetNumber = models.CharField(max_length=20, verbose_name="Номер дома")
+    coordinates = models.OneToOneField(Coordinates, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Координаты")
+
+    def __str__(self):
+        return f"{self.rawAddress}"
+
+    class Meta:
+        verbose_name = 'Адрес'
+        verbose_name_plural = 'Адреса'
+
+
+class Contact(models.Model):
+    email = models.EmailField(verbose_name="Email")
+    name = models.CharField(max_length=100, verbose_name="Имя")
+    phone = models.CharField(max_length=20, verbose_name="Телефон")
+
+    class Meta:
+        verbose_name = 'Контактные данные'
+        verbose_name_plural = 'Контактные данные'
+
+    def __str__(self):
+        return f"{self.name} - {self.phone}"
+
+
 class Order(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     cart_id = models.ForeignKey(Cart, on_delete=models.PROTECT)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    delivery_address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, related_name="delivery_address")
+    pickup_address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, related_name="pickup_address")
+    contact = models.ForeignKey(Contact, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -17,7 +61,7 @@ class Order(models.Model):
         verbose_name_plural = 'Заказы'
 
     def __str__(self):
-        return f'Order {self.id} for {self.user_id}'
+        return f'Order {self.id} for {self.order_id}'
 
 
 class Payment(models.Model):
@@ -31,55 +75,16 @@ class Payment(models.Model):
         (FAILED, 'Failed')
     ]
 
-    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="order_payment")
     payment_method = models.CharField(max_length=50, choices=[('card', 'Card'), ('cash', 'Cash on Delivery')], default='card')
     payment_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDING)
     payment_reference = models.CharField(max_length=100, null=True, blank=True)
     currency_code = models.CharField(max_length=3, default='KGS')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Оплата'
+        verbose_name_plural = 'Оплаты'
 
-class Delivery(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE)
-    delivery_method = models.CharField(max_length=50, choices=[('glovo', 'Glovo'), ('other', 'Other')])
-    delivery_address = models.CharField(max_length=255)
-    delivery_address_latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    delivery_address_longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    recipient_phone = models.CharField(max_length=15)
-    recipient_name = models.CharField(max_length=50, blank=True, null=True)
-    pickup_address = models.CharField(max_length=255, verbose_name="Pickup address")
-    pickup_phone = models.CharField(max_length=15, verbose_name="Pickup phone")
-    status = models.CharField(max_length=50, default='pending')
-    created_at = models.DateTimeField(auto_now_add=True)
 
-    def send_to_glovo(self):
-        """
-        Логика для отправки заказа в Glovo API
-        """
-        # Данные для API Glovo
-        glovo_data = {
-            "address": {
-                "lat": self.delivery_address_latitude,
-                "lon": self.delivery_address_longitude,
-                "label": self.delivery_address
-            },
-            "contact": {
-                "phoneNumber": self.recipient_phone,
-                "name": self.recipient_name or "Anonymous"
-            },
-            "packageDetails": {
-                "description": "Order description"
-            },
-            "packageId": str(self.order.id),
-            "pickupDetails": {
-                "address": self.pickup_address,
-                "contact": {
-                    "phoneNumber": self.pickup_phone,
-                    "name": "Store Contact"
-                }
-            },
-            "price": {
-                "amount": float(self.order.total_price) if self.order.payment.is_cash_on_delivery else None,
-                "currency": self.order.payment.currency_code if self.order.payment.is_cash_on_delivery else None
-            }
-        }
+

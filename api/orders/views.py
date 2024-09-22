@@ -2,43 +2,89 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from apps.products.models import Cart
+
+from api.orders.serializers import AddressSerializer, ContactSerializer, PackageDetailSerializer
+from apps.products.models import Cart, CartItems
 from api.products.serializers import OrderSerializer
-from apps.orders.models import Order
+from apps.orders.models import Order, Address, Contact
 
 
 class CreateOrderView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        # Получаем корзину пользователя
-        cart = Cart.objects.filter(user_id=request.user).first()
+        # Получаем данные корзины
+        cart_id = request.data.get('cart_id')
+        try:
+            cart = Cart.objects.get(id=cart_id)
+        except Cart.DoesNotExist:
+            return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        if not cart or cart.cartitems.count() == 0:
-            return Response({"error": "Корзина пуста"}, status=status.HTTP_400_BAD_REQUEST)
+        # Получаем данные для доставки и контакта
+        delivery_address_id = request.data.get('delivery_address_id')
+        pickup_address_id = request.data.get('pickup_address_id')
+        contact_id = request.data.get('contact_id')
 
-        # Собираем данные для заказа
-        order_data = {
-            'user_id': request.user.id,
-            'cart_id': cart.id,
-            'delivery_method': request.data.get('delivery_method'),
-            'delivery_address': request.data.get('delivery_address'),
-            'recipient_phone': request.data.get('recipient_phone'),
-            'comments': request.data.get('comments', ''),
-            'status': 'Ожидает оплаты',  # Начальный статус заказа
-            'total_price': cart.total_cart_price,  # Итоговая цена — общая стоимость корзины
+        try:
+            delivery_address = Address.objects.get(id=delivery_address_id)
+            pickup_address = Address.objects.get(id=pickup_address_id)
+            contact = Contact.objects.get(id=contact_id)
+        except (Address.DoesNotExist, Contact.DoesNotExist):
+            return Response({"error": "Invalid delivery or contact details"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Создание заказа
+        order = Order.objects.create(cart_id=cart, delivery_address=delivery_address, pickup_address=pickup_address, contact=contact)
+
+        # Формирование деталей посылки из товаров в корзине
+        cart_items = CartItems.objects.filter(cart_id=cart)
+        description = ", ".join([f"{item.quantity}x {item.product_id.name}" for item in cart_items])
+        parcel_value = sum([item.total_item_price for item in cart_items])
+        weight = sum([item.product_id.weight for item in cart_items])
+        print('description ', description)
+        print('parcel_value ', parcel_value)
+        print('weight ', weight)
+
+        package_details = {
+            "contentType": "FOOD",
+            "description": description,
+            "parcelValue": parcel_value,
+            "weight": weight
+        }
+        package_serializer = PackageDetailSerializer(data=package_details)
+        if not package_serializer.is_valid():
+            return Response({"error": package_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        package_serializer = PackageDetailSerializer(data=package_details)
+        if not package_serializer.is_valid():
+            return Response({"error": "Invalid package details"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Создание JSON ответа
+        response_data = {
+            "address": AddressSerializer(delivery_address).data,
+            "contact": ContactSerializer(contact).data,
+            "packageDetails": package_serializer.data,
+            "packageId": f"order_{order.id}",
+            "pickupDetails": {
+                "address": AddressSerializer(pickup_address).data,
+                "addressBook": {"id": "00000000-0000-0000-0000-000000000000"},
+                "pickupOrderCode": "PickupOrderCode123",
+                "pickupTime": "2019-08-24T14:15:22Z",  # Пример времени
+                "pickupPhone": "+34666666666"
+            },
+            "price": {
+                "paymentType": "CASH_ON_DELIVERY",
+                "delivery": {
+                    "currencyCode": "EUR",
+                    "value": 5.5
+                },
+                "parcel": {
+                    "currencyCode": "EUR",
+                    "value": parcel_value
+                }
+            }
         }
 
-        # Сериализуем данные заказа
-        serializer = OrderSerializer(data=order_data)
-
-        if serializer.is_valid():
-            order = serializer.save()
-
-            # После успешного создания заказа возвращаем информацию
-            return Response({"message": "Заказ создан", "order_id": order.id}, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 class UpdateOrderStatusView(APIView):

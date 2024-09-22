@@ -70,6 +70,7 @@ class UserRegisterApiView(APIView):
         phone = serializer.validated_data.get("phone")
         raw_password = serializer.validated_data.get("password1")
         email = serializer.validated_data.get("email")
+        first_name = serializer.validated_data.get("first_name")
 
         user = User.objects.filter(phone=phone)
         if user.exists():
@@ -79,6 +80,7 @@ class UserRegisterApiView(APIView):
             user = User(
                 phone=phone,
                 is_confirm=False,
+                first_name=first_name,
                 email=email,
                 created_at = datetime.datetime.now(datetime.timezone.utc)
             )
