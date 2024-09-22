@@ -24,7 +24,15 @@ class ProductSearchView(ListAPIView):
         name = self.request.query_params.get('name', None)
         if name:
             queryset = queryset.filter(name__icontains=name)
-        return Response({"result": queryset}, status=status.HTTP_200_OK)
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        """
+        Переопределение метода list для оборачивания ответа в ключ 'result'
+        """
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({"result": serializer.data}, status=status.HTTP_200_OK)
 
 
 @extend_schema_view(
