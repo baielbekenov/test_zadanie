@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -41,6 +43,7 @@ class ProductSearchView(ListAPIView):
         summary='Смотреть продукты согласно категории'
     ),
 )
+@method_decorator(cache_page(60 * 5), name='list')
 class CategoryDetail(APIView):
     permission_classes = (AllowAny,)
     serializer_class = ProductListInCategorySerializer
@@ -67,6 +70,7 @@ class CategoryDetail(APIView):
         summary='Смотреть детально продукт'
     ),
 )
+@method_decorator(cache_page(60 * 3), name='retrieve')
 class ProductDetailView(RetrieveAPIView):
     permission_classes = (AllowAny,)
     queryset = Product.objects.all()
