@@ -77,11 +77,9 @@ class ProductDetailView(RetrieveAPIView):
     serializer_class = ProductListSerializer
     lookup_field = 'pk'
 
-    def get(self, request, pk):
+    def retrieve(self, request, *args, **kwargs):
         try:
-            product = Product.objects.get(pk=pk)
-            serializer = self.serializer_class(product)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return super().retrieve(request, *args, **kwargs)
         except Product.DoesNotExist:
             return Response({"info": "Товар не найден"}, status=status.HTTP_404_NOT_FOUND)
 
