@@ -53,11 +53,12 @@ class User(AbstractUser):
     phone = models.CharField(max_length=15, unique=True, null=False, verbose_name=_('Номер телефона'))
     email = models.EmailField(unique=True, null=True, blank=True)
     code = models.CharField(max_length=50, null=True, verbose_name=_('Код'), blank=True)
+    username = models.CharField(unique=False, max_length=250, blank=True, null=True, verbose_name=_('Имя пользователя'))
     last_sms_date = models.DateTimeField(null=True, verbose_name=_('Дата отправки кода'), blank=True)
     is_confirm = models.BooleanField(default=False, blank=True, verbose_name=_('Подтверждение почты'))
     created_at = models.DateField(auto_now_add=True)
     objects = UserManager()
-    username = None  # Убираем поле username
+    first_name = None
     last_name = None
 
     USERNAME_FIELD = "phone"
