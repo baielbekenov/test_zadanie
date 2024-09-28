@@ -103,10 +103,14 @@ class CartItemSerializer(serializers.ModelSerializer):
 class CartItemShowSerializer(serializers.ModelSerializer):
     product_name = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
+    weight = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItems
-        fields = ['id', 'product_id', 'product_name', 'quantity', 'image', 'price', 'total_item_price']
+        fields = ['id', 'product_id', 'product_name', 'weight', 'quantity', 'image', 'price', 'total_item_price']
+
+    def get_weight(self, obj):
+        return obj.product_id.weight if obj.product_id else None
 
     def get_product_name(self, obj):
         return obj.product_id.name if obj.product_id else None
