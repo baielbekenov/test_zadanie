@@ -102,13 +102,17 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class CartItemShowSerializer(serializers.ModelSerializer):
     product_name = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItems
-        fields = ['id', 'product_id', 'product_name', 'quantity', 'price', 'total_item_price']
+        fields = ['id', 'product_id', 'product_name', 'quantity', 'image', 'price', 'total_item_price']
 
     def get_product_name(self, obj):
         return obj.product_id.name if obj.product_id else None
+
+    def get_image(self, obj):
+        return obj.product_id.productimages.image if obj.product_id else None
 
 
 class CartSerializer(serializers.ModelSerializer):
