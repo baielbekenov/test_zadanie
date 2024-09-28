@@ -126,6 +126,17 @@ class CartSerializer(serializers.ModelSerializer):
         fields = ['id', 'total_cart_price', 'cartitems']
 
 
+class CartItemCountSerializer(CartSerializer):
+    total_cart_items = serializers.SerializerMethodField()
+
+    class Meta(CartSerializer.Meta):
+        fields = ['total_cart_items']
+
+    def get_total_cart_items(self, obj):
+        # Возвращаем количество элементов в корзине
+        return obj.cartitems.count()
+
+
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order

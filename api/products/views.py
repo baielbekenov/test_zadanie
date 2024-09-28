@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.products.serializers import ProductListInCategorySerializer, ProductListSerializer, CartSerializer, \
-    CartItemSerializer, ProductSerializer
+    CartItemSerializer, ProductSerializer, CartItemCountSerializer
 from django.db import IntegrityError
 from apps.category.models import Category
 from apps.products.models import Product, Cart, CartItems
@@ -139,6 +139,22 @@ class CartView(APIView):
 
     def get(self, request):
         cart = Cart.objects.filter(user_id=self.request.user).order_by('created_at')
+        serializer = self.serializer_class(cart, many=True, context={'request': request})
+        return Response({"result": serializer.data}, status=status.HTTP_200_OK)
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description='API для просмотра количество позиций в корзине',
+        summary='Смотреть колиество позиций в корзине'
+    ),
+)
+class CartItemCountView(APIView):
+    serializer_class = CartItemCountSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        cart = Cart.objects.filter(user_id=self.request.user)
         serializer = self.serializer_class(cart, many=True, context={'request': request})
         return Response({"result": serializer.data}, status=status.HTTP_200_OK)
 
