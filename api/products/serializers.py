@@ -112,7 +112,9 @@ class CartItemShowSerializer(serializers.ModelSerializer):
         return obj.product_id.name if obj.product_id else None
 
     def get_image(self, obj):
-        return obj.product_id.productimages.image if obj.product_id else None
+        if obj.product_id and obj.product_id.productimages.exists():
+            return obj.product_id.productimages.first().image.url
+        return None
 
 
 class CartSerializer(serializers.ModelSerializer):
