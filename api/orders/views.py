@@ -11,6 +11,7 @@ from apps.orders.models import Order, Address, Contact
 
 class CreateOrderView(APIView):
     permission_classes = [IsAuthenticated]
+    # serializer_class =
 
     def post(self, request, *args, **kwargs):
         # Получаем данные корзины

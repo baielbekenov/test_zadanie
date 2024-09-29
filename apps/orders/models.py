@@ -23,6 +23,7 @@ class Address(models.Model):
     country = models.CharField(max_length=100, verbose_name="Страна")
     postalCode = models.CharField(max_length=20, verbose_name="Почтовый индекс")
     rawAddress = models.CharField(max_length=255, verbose_name="Полный адрес")
+    pickup = models.BooleanField(verbose_name='Точка вывоза', default=False)
     details = models.TextField(verbose_name="Дополнительные детали", blank=True, null=True)
     streetName = models.CharField(max_length=255, verbose_name="Улица")
     streetNumber = models.CharField(max_length=20, verbose_name="Номер дома")

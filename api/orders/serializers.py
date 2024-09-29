@@ -46,3 +46,9 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['delivery_address', 'pickup_address', 'contact', 'created_at']
 
+
+class CreateOrderSerializer(serializers.Serializer):
+    delivery_address_id = serializers.IntegerField()
+    pickup_address_id = serializers.IntegerField()
+    contact_id = serializers.IntegerField()
+
