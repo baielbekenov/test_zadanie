@@ -49,6 +49,5 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class CreateOrderSerializer(serializers.Serializer):
     delivery_address_id = serializers.IntegerField()
-    pickup_address_id = serializers.IntegerField()
     contact_id = serializers.IntegerField()
 

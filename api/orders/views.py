@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
-from api.orders.serializers import AddressSerializer, ContactSerializer, PackageDetailSerializer
+from api.orders.serializers import AddressSerializer, ContactSerializer, PackageDetailSerializer, CreateOrderSerializer
+from api.orders.utils import find_nearest_pickup_point
 from apps.products.models import Cart, CartItems
 from api.products.serializers import OrderSerializer
 from apps.orders.models import Order, Address, Contact
@@ -11,30 +12,35 @@ from apps.orders.models import Order, Address, Contact
 
 class CreateOrderView(APIView):
     permission_classes = [IsAuthenticated]
-    # serializer_class =
+    serializer_class = CreateOrderSerializer
 
     def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         # Получаем данные корзины
-        cart_id = request.data.get('cart_id')
         try:
-            cart = Cart.objects.get(id=cart_id)
+            cart = Cart.objects.get(user_id=request.user)
         except Cart.DoesNotExist:
             return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
 
         # Получаем данные для доставки и контакта
-        delivery_address_id = request.data.get('delivery_address_id')
-        pickup_address_id = request.data.get('pickup_address_id')
-        contact_id = request.data.get('contact_id')
+        delivery_address_id = serializer.validated_data.get("delivery_address_id")
+        contact_id = serializer.validated_data.get('contact_id')
 
         try:
             delivery_address = Address.objects.get(id=delivery_address_id)
-            pickup_address = Address.objects.get(id=pickup_address_id)
             contact = Contact.objects.get(id=contact_id)
         except (Address.DoesNotExist, Contact.DoesNotExist):
             return Response({"error": "Invalid delivery or contact details"}, status=status.HTTP_400_BAD_REQUEST)
 
+        nearest_pickup_point = find_nearest_pickup_point(delivery_address)
+        if not nearest_pickup_point:
+            return Response({"error": "No available pickup points"}, status=status.HTTP_400_BAD_REQUEST)
+
         # Создание заказа
-        order = Order.objects.create(cart_id=cart, delivery_address=delivery_address, pickup_address=pickup_address, contact=contact)
+        order = Order.objects.create(cart_id=cart, delivery_address=delivery_address, pickup_address=nearest_pickup_point, contact=contact)
 
         # Формирование деталей посылки из товаров в корзине
         cart_items = CartItems.objects.filter(cart_id=cart)
@@ -66,7 +72,7 @@ class CreateOrderView(APIView):
             "packageDetails": package_serializer.data,
             "packageId": f"order_{order.id}",
             "pickupDetails": {
-                "address": AddressSerializer(pickup_address).data,
+                "address": AddressSerializer(nearest_pickup_point).data,
                 "addressBook": {"id": "00000000-0000-0000-0000-000000000000"},
                 "pickupOrderCode": "PickupOrderCode123",
                 "pickupTime": "2019-08-24T14:15:22Z",  # Пример времени
