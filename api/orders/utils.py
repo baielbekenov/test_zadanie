@@ -2,22 +2,22 @@ from math import radians, sin, cos, sqrt, atan2
 
 from apps.orders.models import Address, Coordinates
 
-import requests
+# import requests
 
 def get_coordinates_from_address(address):
-    url = "https://nominatim.openstreetmap.org/search"
-    params = {
-        'q': address,
-        'format': 'json',
-        'limit': 1  # Нам нужны только первые координаты
-    }
-    response = requests.get(url, params=params)
-    print(params)
-    if response.status_code == 200:
-        data = response.json()
-        if data:
-            # Получаем широту и долготу из первого результата
-            return float(data[0]['lat']), float(data[0]['lon'])
+    # url = "https://nominatim.openstreetmap.org/search"
+    # params = {
+    #     'q': address,
+    #     'format': 'json',
+    #     'limit': 1  # Нам нужны только первые координаты
+    # }
+    # # response = requests.get(url, params=params)
+    # print(params)
+    # if response.status_code == 200:
+    #     data = response.json()
+    #     if data:
+    #         # Получаем широту и долготу из первого результата
+    #         return float(data[0]['lat']), float(data[0]['lon'])
     return None, None
 
 
