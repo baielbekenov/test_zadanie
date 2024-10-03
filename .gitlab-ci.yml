@@ -10,8 +10,9 @@ variables:
   POSTGRES_DB: terratort_database
   POSTGRES_USER: terratort_admin
   POSTGRES_PASSWORD: terratortadmin
-  DOCKER_HOST: tcp://localhost:2375
+  DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
+  DOCKER_WAIT_START: 60
 
 before_script:
   - docker info
@@ -29,6 +30,11 @@ build-job:
   stage: build
   script:
     - docker-compose -f docker-compose.yml build
+  tags:
+    - docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+  privileged: true
 
 # Test stage: запуск и проверка контейнеров (локально в CI)
 test-job:
