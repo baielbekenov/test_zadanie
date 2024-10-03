@@ -21,7 +21,8 @@ image: docker:latest
 
 # Включение Docker-in-Docker для запуска контейнеров
 services:
-  - docker:dind
+  - name: docker:dind
+    command: ["--privileged"]
 
 # Build stage: сборка Docker образов
 build-job:
