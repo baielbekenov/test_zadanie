@@ -6,6 +6,7 @@ WORKDIR /backend
 COPY ./requirements/dev.txt /backend/requirements/dev.txt
 
 # Устанавливаем зависимости
+RUN pip install --no-cache-dir requests
 RUN pip install --no-cache-dir --upgrade pip setuptools
 RUN pip install --no-cache-dir -r /backend/requirements/dev.txt
 
