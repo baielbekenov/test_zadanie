@@ -1,29 +1,28 @@
-
-stages:          # List of stages for jobs, and their order of execution
+stages:
   - build
   - test
   - deploy
 
-## Переменные, используемые во всех задачах
-variables:
-  DOCKER_HOST: tcp://docker:2375/
-  DOCKER_TLS_CERTDIR: ""
-#
-#before_script:
-#  - docker info
-
-# Использование Docker в GitLab CI
+# Использование Docker-образа для выполнения команд Docker
 image: docker:latest
 
 # Включение Docker-in-Docker для запуска контейнеров
 services:
   - name: docker:dind
     command: ["--privileged"]
+    entrypoint: ["/bin/sh", "-c", "dockerd-entrypoint.sh || sleep 20"]
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  DNS_SERVER: 85.192.61.141
 
 # Build stage: сборка Docker образов
 build-job:
   stage: build
   script:
+    - echo "Starting Docker build..."
+    - docker info
     - docker build -t backend .
 
 # Test stage: запуск и проверка контейнеров (локально в CI)
