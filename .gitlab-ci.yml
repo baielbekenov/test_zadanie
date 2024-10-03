@@ -13,6 +13,9 @@ variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
 
+before_script:
+  - docker info
+
 # Использование Docker в GitLab CI
 image: docker:latest
 
