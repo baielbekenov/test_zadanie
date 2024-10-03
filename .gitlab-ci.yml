@@ -34,7 +34,6 @@ build-job:
     - docker
   variables:
     DOCKER_HOST: tcp://docker:2375
-  privileged: true
 
 # Test stage: запуск и проверка контейнеров (локально в CI)
 test-job:
