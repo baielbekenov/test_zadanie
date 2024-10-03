@@ -3,61 +3,23 @@ stages:
   - test
   - deploy
 
-# Использование Docker-образа для выполнения команд Docker
+# Использование Docker без Docker-in-Docker
 image: docker:latest
-
-# Включение Docker-in-Docker для запуска контейнеров
-services:
-  - name: docker:dind
-    command: ["--privileged"]
-    entrypoint: ["/bin/sh", "-c", "dockerd-entrypoint.sh || sleep 20"]
-
-variables:
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ""
-  DNS_SERVER: 85.192.61.141
 
 # Build stage: сборка Docker образов
 build-job:
   stage: build
   script:
-    - echo "Starting Docker build..."
     - docker info
     - docker build -t backend .
 
-# Test stage: запуск и проверка контейнеров (локально в CI)
 test-job:
   stage: test
   script:
-    # Запуск контейнеров в фоновом режиме для тестирования
     - docker-compose -f docker-compose.yml up -d
-    # Ожидание, пока PostgreSQL станет доступен
-    - until docker exec db pg_isready -h db -p 5432 -U terratort_admin; do echo "waiting for postgres"; sleep 2; done
-    # Прогон миграций и запуск тестов
-    - docker-compose exec backend python3 manage.py test
-  after_script:
-    - docker-compose down
+    - docker-compose exec backend pytest
 
-# Deploy stage: деплой без остановки текущих контейнеров
 deploy-job:
   stage: deploy
   script:
-    # Логин в Docker registry (например, Docker Hub или GitLab Registry)
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-    # Пуш Docker образов в реестр
-    - docker-compose -f docker-compose.yml push
-
-    # Подключение к удалённому серверу по SSH для обновления контейнеров
-    - |
-      ssh user@your_server << 'EOF'
-      cd /path/to/your/project
-
-      # Остановка старых контейнеров и обновление образов
-      docker-compose down
-      docker-compose pull
-
-      # Запуск новых контейнеров в фоновом режиме
-      docker-compose up -d
-      EOF
-
-
+    - echo "Deploy stage here"
