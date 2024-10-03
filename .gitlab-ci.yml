@@ -4,21 +4,21 @@ stages:          # List of stages for jobs, and their order of execution
   - test
   - deploy
 
-# Переменные, используемые во всех задачах
-variables:
-  DOCKER_DRIVER: overlay2
-  POSTGRES_DB: terratort_database
-  POSTGRES_USER: terratort_admin
-  POSTGRES_PASSWORD: terratortadmin
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ""
-  DOCKER_WAIT_START: 60
-
-before_script:
-  - docker info
+## Переменные, используемые во всех задачах
+#variables:
+#  DOCKER_DRIVER: overlay2
+#  POSTGRES_DB: terratort_database
+#  POSTGRES_USER: terratort_admin
+#  POSTGRES_PASSWORD: terratortadmin
+#  DOCKER_HOST: tcp://docker:2375
+#  DOCKER_TLS_CERTDIR: ""
+#  DOCKER_WAIT_START: 60
+#
+#before_script:
+#  - docker info
 
 # Использование Docker в GitLab CI
-image: docker:latest
+#image: docker:latest
 
 # Включение Docker-in-Docker для запуска контейнеров
 services:
@@ -29,11 +29,7 @@ services:
 build-job:
   stage: build
   script:
-    - docker-compose -f docker-compose.yml build
-  tags:
-    - docker
-  variables:
-    DOCKER_HOST: tcp://docker:2375
+    - docker build -t backend .
 
 # Test stage: запуск и проверка контейнеров (локально в CI)
 test-job:
