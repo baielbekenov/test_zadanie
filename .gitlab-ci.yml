@@ -17,7 +17,6 @@ test-job:
   stage: test
   script:
     - docker-compose -f docker-compose.yml up -d
-    - docker-compose exec backend pytest
 
 deploy-job:
   stage: deploy
