@@ -55,7 +55,7 @@ services:
       - "8080:8080"
     volumes:
       - ./nginx/default.conf:/etc/nginx/nginx.conf
-      - static_volume:/app/static
+      - static_volume:/usr/src/app/static
     depends_on:
       - backend
     container_name: nginx
