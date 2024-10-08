@@ -17,8 +17,8 @@ services:
     command: >
       sh -c "until pg_isready -h db -p 5432 -U terratort_admin; do echo waiting for postgres; sleep 2; done && python3 manage.py migrate && gunicorn main.wsgi:application --bind 0.0.0.0:8000"
     volumes:
-      - static_volume:/usr/src/app/static
-      - media_volume:/usr/src/app/media
+      - static_volume:/app/static
+      - media_volume:/app/media
       - .:/app
     env_file:
       - .env
@@ -55,7 +55,8 @@ services:
       - "8080:8080"
     volumes:
       - ./nginx/default.conf:/etc/nginx/nginx.conf
-      - static_volume:/usr/src/app/static
+      - static_volume:/app/static
+      - media_volume:/app/media
     depends_on:
       - backend
     container_name: nginx
