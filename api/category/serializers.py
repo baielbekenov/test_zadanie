@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from apps.category.models import Category, AppBar
+from apps.category.models import Category, Banner
 
 
-class AppBarSerializer(serializers.ModelSerializer):
+class BannerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AppBar
-        fields = ['image']
+        model = Banner
+        fields = ['id', 'image', 'url']
 
 
 class CategorySerializer(serializers.ModelSerializer):

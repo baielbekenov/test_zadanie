@@ -1,12 +1,11 @@
 from django.db import models
 
 
-class AppBar(models.Model):
-    image = models.ImageField(upload_to='images/appbar/%Y/%m', blank=True, null=True, verbose_name='АппБар')
-
-    class Meta:
-        verbose_name = 'Аппбар'
-        verbose_name_plural = 'Аппбар'
+class Banner(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Название', default='Здесь должно быть название баннера')
+    image = models.ImageField(upload_to='banners/%Y/%m', verbose_name='Изображение')
+    description = models.TextField(verbose_name='Описание')
+    url = models.URLField()
 
 
 class Category(models.Model):
