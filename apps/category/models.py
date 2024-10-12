@@ -6,7 +6,6 @@ class Banner(models.Model):
     image = models.ImageField(upload_to='banners/%Y/%m', verbose_name='Изображение')
     description = models.TextField(verbose_name='Описание')
     url = models.URLField()
-    test = models.CharField(max_length=100, verbose_name='Название', default='Это тестовое')
 
     class Meta:
         verbose_name = 'Баннер'
