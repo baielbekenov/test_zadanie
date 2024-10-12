@@ -3,6 +3,11 @@ from django.db import models
 from apps.category.models import Category
 from apps.user.models import User
 
+size = ((1, ('маленький')),
+        (2, ('средний')),
+        (3, ('большой')),
+        )
+
 
 class Product(models.Model):
     name = models.CharField(max_length=150, verbose_name='Название')
@@ -11,6 +16,7 @@ class Product(models.Model):
     description = models.TextField(verbose_name='Описание', blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена', default=0)
     weight = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Вес (кг)', blank=True, null=True)
+    size = models.IntegerField(choices=size, verbose_name='Размер', default=1)
     created_at = models.DateField(auto_now_add=True, verbose_name='Дата создание')
     ordering = models.PositiveIntegerField(verbose_name='Порядок', default=0)
 
