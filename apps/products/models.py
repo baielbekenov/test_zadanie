@@ -3,7 +3,7 @@ from django.db import models
 from apps.category.models import Category
 from apps.user.models import User
 
-size = ((1, ('маленький')),
+size = ((1, ('никакой')),
         (2, ('средний')),
         (3, ('большой')),
         )

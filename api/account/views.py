@@ -1,5 +1,6 @@
+from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -10,9 +11,9 @@ from django.contrib.auth import get_user_model
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext as _
 from api.account.serializers import UserAccountSerializer, ChangePasswordSerializer, \
-    ConfirmUserEmailSerializer, ActivateUserEmailSerializer
+    ConfirmUserEmailSerializer, ActivateUserEmailSerializer, PrivacySerializer, PolicySerializer
 from api.account.utils import send_code_email_confirm
-
+from apps.user.models import Privacy, Policy
 
 User = get_user_model()
 
@@ -99,3 +100,35 @@ class ActivateEmailUserView(APIView):
             {"info": _("Email подтвержден!.")},
             status=status.HTTP_200_OK,
         )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        description=_('URL для политики'),
+        summary=_('Отобразить политику конфиденциальности'),
+    ),
+)
+class PolicyView(APIView):
+    serializer_class = PolicySerializer
+    permission_classes = (AllowAny, )
+
+    def get(self, request):
+        queryset = Policy.objects.all()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response({'result': serializer.data}, status=status.HTTP_200_OK)
+
+
+@extend_schema_view(
+    post=extend_schema(
+        description=_('URL для правила'),
+        summary=_('Отобразить правила'),
+    ),
+)
+class PrivacyView(APIView):
+    serializer_class = PrivacySerializer
+    permission_classes = (AllowAny, )
+
+    def get(self, request):
+        queryset = Privacy.objects.all()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response({'result': serializer.data}, status=status.HTTP_200_OK)
