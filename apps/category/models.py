@@ -7,6 +7,13 @@ class Banner(models.Model):
     description = models.TextField(verbose_name='Описание')
     url = models.URLField()
 
+    class Meta:
+        verbose_name = 'Баннер'
+        verbose_name_plural = 'Баннеры'
+
+    def __str__(self):
+        return self.name
+
 
 class Category(models.Model):
     name = models.CharField(max_length=150, unique=True, null=False, verbose_name='Название')

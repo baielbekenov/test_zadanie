@@ -5,7 +5,7 @@ from api.products.views import CategoryDetail
 
 urlpatterns = [
     path('category/list/', CategoryListView.as_view()),
-    path('appbar/list/', BannerListView.as_view())
+    path('banner/list/', BannerListView.as_view())
 ]
 
 
