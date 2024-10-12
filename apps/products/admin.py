@@ -5,7 +5,7 @@ from apps.products.models import Product, Image, Cart, CartItems
 
 @admin.register(Product)
 class ProductcAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category_id', 'price', 'weight', 'ordering')
+    list_display = ('name', 'category_id', 'price', 'weight', 'size', 'ordering')
 
 
 admin.site.register(Image)
