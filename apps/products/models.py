@@ -6,8 +6,7 @@ from apps.user.models import User
 
 class Product(models.Model):
     name = models.CharField(max_length=150, verbose_name='Название')
-    categories = models.ManyToManyField(Category, on_delete=models.SET_NULL,
-                                    blank=True, null=True, verbose_name='Категории', related_name='productcategory')
+    categories = models.ManyToManyField(Category, blank=True, null=True, verbose_name='Категории', related_name='productcategory')
     description = models.TextField(verbose_name='Описание', blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена', default=0)
     weight = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Вес (кг)', blank=True, null=True)
