@@ -6,8 +6,8 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_DB: my_database
-      POSTGRES_USER: terratort_admin
-      POSTGRES_PASSWORD: terratortadmin
+      POSTGRES_USER: my_admin
+      POSTGRES_PASSWORD: my_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     container_name: db
