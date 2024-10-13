@@ -57,6 +57,16 @@ services:
       restart_policy:
         condition: any
 
+  daphne:
+    build:
+      context: .
+      dockerfile: daphne/Dockerfile  # Указываем Dockerfile для Daphne
+    ports:
+      - "9000:9000"
+    depends_on:
+      - db
+    container_name: daphne
+
 volumes:
   postgres_data:
   static_volume:

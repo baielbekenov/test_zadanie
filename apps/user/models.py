@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext as _
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 class UserManager(BaseUserManager):
@@ -70,3 +72,17 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+    def save(self, *args, **kwargs):
+        # Вызов стандартного метода save() для сохранения пользователя
+        super().save(*args, **kwargs)
+
+        # Логика уведомлений
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'notifications',
+            {
+                'type': 'send_notification',
+                'message': f'Новый пользователь {self.phone} был создан!'
+            }
+        )

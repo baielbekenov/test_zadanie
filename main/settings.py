@@ -22,12 +22,14 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'apps.user',
     'apps.category',
     'apps.products',
@@ -66,7 +68,7 @@ AUTH_USER_MODEL = "user.User"
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -210,6 +212,14 @@ SPECTACULAR_SETTINGS = {
         "CountMonthsEnum": "api.billing.serializers.PeriodChoices",
     },
     "SERVE_PERMISSIONS": ("rest_framework.permissions.AllowAny",)
+}
+
+ASGI_APPLICATION = 'main.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
 }
 
 SIMPLE_JWT = {
