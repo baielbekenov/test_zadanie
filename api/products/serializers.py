@@ -9,7 +9,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'category_id', 'description', 'images', 'price', 'weight', 'created_at']
+        fields = ['id', 'name', 'categories', 'description', 'images', 'price', 'weight', 'created_at']
 
     def get_images(self, obj):
         request = self.context.get('request')
