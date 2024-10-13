@@ -2,7 +2,6 @@ from rest_framework import serializers
 from django.conf import settings
 from apps.category.models import Category
 from apps.products.models import Product, Cart, CartItems
-from apps.orders.models import Order
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -61,7 +60,6 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartItems
-        # Убираем cart_id из полей, так как он будет привязан автоматически
         fields = ['id', 'product_id', 'quantity', 'price', 'total_item_price']
 
     def validate_quantity(self, value):
@@ -72,26 +70,19 @@ class CartItemSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        # Получаем или создаем корзину для текущего пользователя
         cart, created = Cart.objects.get_or_create(user_id=self.context['request'].user)
-
-        # Убираем cart_id из validated_data, если оно там есть
         validated_data.pop('cart_id', None)
 
-        # Проверяем, существует ли товар с таким же product_id в корзине
         product_id = validated_data.get('product_id')
         quantity = validated_data.get('quantity')
 
         try:
-            # Ищем товар в корзине
             cart_item = CartItems.objects.get(cart_id=cart, product_id=product_id)
-            # Увеличиваем количество существующего товара
             cart_item.quantity += quantity
             cart_item.total_item_price = cart_item.quantity * cart_item.price
             cart_item.save()
 
         except CartItems.DoesNotExist:
-            # Если товара нет в корзине, создаем новый элемент
             cart_item = CartItems.objects.create(cart_id=cart, **validated_data)
             cart_item.price = cart_item.product_id.price
             cart_item.total_item_price = cart_item.quantity * cart_item.price
@@ -140,10 +131,5 @@ class CartItemCountSerializer(CartSerializer):
         # Возвращаем количество элементов в корзине
         return obj.cartitems.count()
 
-
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ['id', 'user_id', 'cart_id', 'delivery_method', 'delivery_address', 'recipient_phone', 'comments', 'status', 'total_price', 'created_at']
 
 
